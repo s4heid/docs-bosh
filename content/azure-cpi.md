@@ -90,7 +90,7 @@ Schema for `cloud_properties` section:
 
 - **root_disk** [Hash, optional]: OS disk of custom size.
     - **size** [Integer, optional]: Specifies the disk size in MiB.
-        - The size must be greater than 3 * 1024 and less than the max disk size for [unmanaged](https://azure.microsoft.com/en-us/pricing/details/storage/page-blobs/) or [managed](https://azure.microsoft.com/en-us/pricing/details/managed-disks/) disk. Please always use `N * 1024` as the size because Azure always uses GiB but not MiB.
+        - The size must be greater than 3 * 1024 and less than the max disk size for [unmanaged](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-pageblob-overview) or [managed](https://azure.microsoft.com/en-us/pricing/details/managed-disks/) disk. Please always use `N * 1024` as the size because Azure always uses GiB but not MiB.
         - It has a default value `30 * 1024` only when ephemeral_disk.use\_root\_disk is set to true.
     - **disk_encryption_set_name** [String, optional]: The Azure Disk Encryption Set name to use when creating the root disk. This is used to encrypt the disk with customer provided keys rather than the default Azure provided encryption keys. Available since v52.0.0.
 - **caching** [String, optional]: Type of the disk caching of the VMs' OS disks. It can be either `None`, `ReadOnly` or `ReadWrite`. Default is `ReadWrite`.
@@ -102,7 +102,7 @@ Schema for `cloud_properties` section:
         - If the Azure temporary disk size for the instance type is larger than `1000*1024` MiB, the default size is `1000*1024` MiB because it is not expected to use such a large ephemeral disk in CF currently.
         - Otherwise, the Azure temporary disk size will be used as the default size. See more information about [Azure temporary disk size](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/overview).
     - **caching** [String, optional]: Type of the disk caching. It can be either `None`, `ReadOnly` or `ReadWrite`. Default is `None`.
-    - **type** [String, optional]: Storage account type. Valid only when `use_managed_disks` is `true`. It can be either `Standard_LRS`, `Premium_LRS` or `PremiumV2_LRS`. See [Azure storage account types](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview#types-of-storage-accounts) for more information. For `PremiumV2_LRS`, you have to set caching to `None` since `PremiumV2_LRS` does currently not support caching.
+    - **type** [String, optional]: Storage account type. Valid only when `use_managed_disks` is `true`. It can be either `Standard_LRS`, `Premium_LRS` or `PremiumV2_LRS`. See [Azure managed disk types](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types) for more information. For `PremiumV2_LRS`, you have to set caching to `None` since `PremiumV2_LRS` does currently not support caching.
     - **iops** [Integer, optional]: IOPS of the disk. If you need more IOPS than the baseline offers, you can increase the IOPS of the disks. For more details, see [Premium SSD v2 performance](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd-v2-performance). Only supported for `PremiumV2_LRS`
     - **mbps** [Integer, optional]: Throughput in MB/s of the disk. If you need more throughput than the baseline offers, you can increase the throughput of the disks. For more details, see [Premium SSD v2 performance](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd-v2-performance). Only supported for `PremiumV2_LRS`
     - **disk_encryption_set_name** [String, optional]: The Azure Disk Encryption Set name to use when creating the ephemeral disk. This is used to encrypt the disk with customer provided keys rather than the default Azure provided encryption keys. Available since v52.0.0.
@@ -172,10 +172,10 @@ Schema for `cloud_properties` section:
     - Only one of `availability_zone` and `availability_set` is allowed to be configured for a VM. If `availability_zone` is specified, the VM will be in a zone and not in any availability set.
 - **platform\_update\_domain_count** [Integer, optional]: The count of [update domains](https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview#update-domains) in the availability set.
     - For Azure, the default value is `5`.
-    - For Azure Stack, the default value is `1`.
+    - For Azure Stack Hub, the default value is `1`.
 - **platform\_fault\_domain_count** [Integer, optional]: The count of [fault domains](https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview#fault-domains) in the availability set.
     - For Azure, the default value of an unmanaged availability set is `3`. The default value of a managed availability set is `2`, because [some regions support only two managed-disk fault domains](https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview#disk-fault-domains).
-    - For Azure Stack, the default value is `1`. Before the 1802 update, only `1` is allowed. After the 1802 update, you can configure up to 3 fault domains.
+    - For Azure Stack Hub, the default value is `1`. Before the 1802 update, only `1` is allowed. After the 1802 update, you can configure up to 3 fault domains.
 
 - **storage\_account\_name** [String, optional]: Storage account for VMs. Valid only when `use_managed_disks` is `false`. If this is not set, the VMs will be created in the default storage account. See [this document](https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/master/docs/advanced/deploy-cloudfoundry-with-multiple-storage-accounts/README.md) for more details on why this option exists.
     - If you use `DS-series` or `GS-series` as `instance_type`, you should set this to a premium storage account. See more information about [Azure premium page blobs](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-pageblob-overview). See [available regions](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/) where you can create premium storage accounts.
@@ -379,12 +379,12 @@ instance_groups:
 ## Disk Types {: #disk-pools }
 
 - **name** [String, required]: Name of the disk type.
-- **disk_size** [Integer, required]: Size of the disk in MiB. On Azure the disk size must be greater than 1 * 1024 and less than the max disk size for [unmanaged](https://azure.microsoft.com/en-us/pricing/details/storage/page-blobs/) or [managed](https://azure.microsoft.com/en-us/pricing/details/managed-disks/) disk. Please always use `N * 1024` as the size because Azure always uses GiB not MiB.
+- **disk_size** [Integer, required]: Size of the disk in MiB. On Azure the disk size must be greater than 1 * 1024 and less than the max disk size for [unmanaged](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-pageblob-overview) or [managed](https://azure.microsoft.com/en-us/pricing/details/managed-disks/) disk. Please always use `N * 1024` as the size because Azure always uses GiB not MiB.
 
 Schema for `cloud_properties` section:
 
 - **caching** [String, optional]: Type of the disk caching. It can be either `None`, `ReadOnly` or `ReadWrite`. Default is `None`.
-- **storage\_account\_type** [String, optional]: Storage account type. Valid only when `use_managed_disks` is `true`. It can be either `Standard_LRS`, `Premium_LRS` or `PremiumV2_LRS`. See [Azure storage account types](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview#types-of-storage-accounts) for more information. For `PremiumV2_LRS`, you have to set caching to `None` since `PremiumV2_LRS` does currently not support caching.
+- **storage\_account\_type** [String, optional]: Storage account type. Valid only when `use_managed_disks` is `true`. It can be either `Standard_LRS`, `Premium_LRS` or `PremiumV2_LRS`. See [Azure managed disk types](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types) for more information. For `PremiumV2_LRS`, you have to set caching to `None` since `PremiumV2_LRS` does currently not support caching.
 - **iops** [Integer, optional]: IOPS of the disk. If you need more IOPS than the baseline offers, you can increase the IOPS of the disks. For more details, see [Premium SSD v2 performance](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd-v2-performance). Only supported for `PremiumV2_LRS`
 - **mbps** [Integer, optional]: Throughput in MB/s of the disk. If you need more throughput than the baseline offers, you can increase the throughput of the disks. For more details, see [Premium SSD v2 performance](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd-v2-performance). Only supported for `PremiumV2_LRS`
 - **disk_encryption_set_name** [String, optional]: The Azure Disk Encryption Set name to use when creating the persistent disk. This is used to encrypt the disk with customer provided keys rather than the default Azure provided encryption keys. Available since v52.0.0.
@@ -421,13 +421,13 @@ Schema:
 - **default\_security\_group** [String, optional]: Name of the default [security group](https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview) that will be applied to all created VMs. This property is required before v35.0.0, and optional in v35.0.0+.
 
 - **azure_stack** [Hash, optional]: Configuration for [Azure Stack Hub](https://learn.microsoft.com/en-us/azure-stack/operator/azure-stack-overview?view=azs-2604). Available in v23+.
-    - **domain** [String, optional]: The domain for your AzureStack deployment. Default is `local.azurestack.external`. You can use the default value for Azure Stack Development Kit. To get this value for Azure Stack integrated systems, contact your service provider.
-    - **authentication** [String, optional]: The authentication type for your AzureStack deployment. Possible values are: `AzureAD`, `AzureChinaCloudAD` and `ADFS`. You need to specify `certificate` if you select `ADFS`, because Azure Stack with ADFS authentication only supports the service principal with a certificate.
-    - **resource** [String, optional]: Active Directory Service Endpoint Resource ID, where you can get the token for your AzureStack deployment.
-    - **endpoint_prefix** [String, optional]: The endpoint prefix for your AzureStack deployment. Default is `management`.
+    - **domain** [String, optional]: The domain for your Azure Stack Hub deployment. Default is `local.azurestack.external`. You can use the default value for Azure Stack Development Kit. To get this value for Azure Stack Hub integrated systems, contact your service provider.
+    - **authentication** [String, optional]: The authentication type for your Azure Stack Hub deployment. Possible values are: `AzureAD`, `AzureChinaCloudAD` and `ADFS`. You need to specify `certificate` if you select `ADFS`, because Azure Stack Hub with ADFS authentication only supports the service principal with a certificate.
+    - **resource** [String, optional]: Active Directory Service Endpoint Resource ID, where you can get the token for your Azure Stack Hub deployment.
+    - **endpoint_prefix** [String, optional]: The endpoint prefix for your Azure Stack Hub deployment. Default is `management`.
     - **skip\_ssl\_validation** [Boolean, optional]: Toggles verification of the Azure Resource Manager REST API SSL certificate. Default is `false`. Deprecated in v35.0.0+.
     - **use\_http\_to\_access\_storage\_account** [Boolean, optional]: Flag for using HTTP to access storage account rather than the default HTTPS. Default is `false`. Deprecated in v35.0.0+.
-    - **ca_cert** [String, required]: All required custom CA certificates for AzureStack. You can [export the Azure Stack Hub CA root certificate](https://learn.microsoft.com/en-us/azure-stack/operator/azure-stack-cli-admin?view=azs-2604#export-the-azure-stack-hub-ca-root-certificate). Available in v27+.
+    - **ca_cert** [String, required]: All required custom CA certificates for Azure Stack Hub. You can [export the Azure Stack Hub CA root certificate](https://learn.microsoft.com/en-us/azure-stack/operator/azure-stack-cli-admin?view=azs-2604#export-the-azure-stack-hub-ca-root-certificate). Available in v27+.
         - The property is required for v35.0.0+.
         - For the versions from v27 to v34, if `ca_cert` is not provided, the `skip_ssl_validation` and `use_http_to_access_storage_account` must be set to `true`.
 
