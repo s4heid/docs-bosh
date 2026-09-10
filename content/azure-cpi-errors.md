@@ -55,7 +55,7 @@ The BOSH snapshot operation may be throttled if you do all of the following:
 
 - Use Premium Storage for the Cloud Foundry VMs.
 
-- Enable snapshot in `bosh.yml`. For more information on BOSH Snapshots, see <https://bosh.io/docs/snapshots/>.
+- Enable snapshot in `bosh.yml`. For more information on BOSH Snapshots, see [snapshots](snapshots.md).
 
     ```yaml
     director:
